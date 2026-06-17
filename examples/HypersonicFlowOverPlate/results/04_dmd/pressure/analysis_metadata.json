@@ -1,0 +1,49 @@
+{
+  "field": "pressure",
+  "variable_name": "Pressure",
+  "units": "Pa",
+  "cube_shape": [
+    501,
+    50,
+    1201
+  ],
+  "crop_mm": {
+    "x": [
+      40.041631973355535,
+      99.99167360532888
+    ],
+    "y": [
+      0.025,
+      2.475
+    ]
+  },
+  "dt_seconds": 1.0000000000000001e-07,
+  "sampling_frequency_hz": 10000000.0,
+  "step_first": 750000,
+  "step_interval": 100,
+  "detrend": "mean",
+  "moving_average_window": 300,
+  "svd_rank": 30,
+  "exact": true,
+  "opt": true,
+  "forward_backward": true,
+  "sorted_eigs": "abs",
+  "n_positive_modes": 14,
+  "snapshot_matrix_condition_number": 80296948217759.73,
+  "dominant_mode": {
+    "rank": 1,
+    "full_index": 21,
+    "frequency_hz": 251268.4268460526,
+    "frequency_khz": 251.26842684605262,
+    "growth_rate_per_s": 3111.1010757676677,
+    "amplitude_abs": 596.5921988094145,
+    "normalized_amplitude": 1.0,
+    "coefficient_rms": 646.1516312550091,
+    "wavelength_mm": 3.1578947368421053,
+    "phase_speed_mps": 793.4792426717452,
+    "eigenvalue_real": 0.9878706411429151,
+    "eigenvalue_imag": 0.15727050010155516,
+    "mode_real_abs_max": 15.954281374293256,
+    "mode_amplitude_max": 15.954281374293256
+  }
+}

@@ -126,7 +126,7 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--source", type=Path, default=DEFAULT_SOURCE,
                     help="source DSMC case root (contains npy_files/ and *.dan)")
-    ap.add_argument("--out", type=Path, default=TUTORIAL_DIR / "data",
+    ap.add_argument("--out", type=Path, default=TUTORIAL_DIR / "examples" / "HypersonicFlowOverPlate" / "data",
                     help="output data directory")
     ap.add_argument("--step-start", type=int, default=750000)
     ap.add_argument("--step-end", type=int, default=800000)

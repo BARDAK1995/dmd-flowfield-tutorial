@@ -39,11 +39,12 @@ import numpy as np
 from dmdkit import dataset, fields, dmd, viz, io_utils
 
 TUT = Path(__file__).resolve().parents[1]
+EXAMPLE = TUT / "examples" / "HypersonicFlowOverPlate"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=Path, default=TUT / "data")
+    ap.add_argument("--data", type=Path, default=EXAMPLE / "data")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--field", default="pressure")
     ap.add_argument("--pairs", type=int, default=3,
@@ -66,7 +67,7 @@ def main() -> None:
     args = ap.parse_args()
     viz.configure()
 
-    out = args.out or (TUT / "outputs" / "05_reconstruction" / args.field)
+    out = args.out or (EXAMPLE / "results" / "05_reconstruction" / args.field)
     dirs = io_utils.ensure_dirs(out)
 
     f = dataset.load_field(args.data, args.field)

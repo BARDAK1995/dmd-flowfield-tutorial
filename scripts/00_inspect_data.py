@@ -14,7 +14,7 @@ It also saves the time-mean field plus one representative fluctuation snapshot f
 each variable, so you can see the steady background and the unsteady part side by side.
 
 Usage:
-    python scripts/00_inspect_data.py                 # uses ../data and ../outputs
+    python scripts/00_inspect_data.py                 # uses the HypersonicFlowOverPlate example
     python scripts/00_inspect_data.py --data DIR --out DIR
 """
 from __future__ import annotations
@@ -30,12 +30,13 @@ import numpy as np
 from dmdkit import dataset, fields, viz, io_utils
 
 TUT = Path(__file__).resolve().parents[1]
+EXAMPLE = TUT / "examples" / "HypersonicFlowOverPlate"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=Path, default=TUT / "data")
-    ap.add_argument("--out", type=Path, default=TUT / "outputs" / "00_inspect")
+    ap.add_argument("--data", type=Path, default=EXAMPLE / "data")
+    ap.add_argument("--out", type=Path, default=EXAMPLE / "results" / "00_inspect")
     args = ap.parse_args()
     viz.configure()
     args.out.mkdir(parents=True, exist_ok=True)

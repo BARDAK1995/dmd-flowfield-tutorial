@@ -27,12 +27,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dmdkit import dataset, fields, viz, io_utils
 
 TUT = Path(__file__).resolve().parents[1]
+EXAMPLE = TUT / "examples" / "HypersonicFlowOverPlate"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=Path, default=TUT / "data")
-    ap.add_argument("--out", type=Path, default=TUT / "outputs" / "02_rms")
+    ap.add_argument("--data", type=Path, default=EXAMPLE / "data")
+    ap.add_argument("--out", type=Path, default=EXAMPLE / "results" / "02_rms")
     ap.add_argument("--field", default="all")
     ap.add_argument("--detrend", default="linear", choices=["linear", "mean"])
     args = ap.parse_args()

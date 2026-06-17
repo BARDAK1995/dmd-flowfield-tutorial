@@ -31,12 +31,13 @@ import numpy as np
 from dmdkit import dataset, psd, viz, io_utils
 
 TUT = Path(__file__).resolve().parents[1]
+EXAMPLE = TUT / "examples" / "HypersonicFlowOverPlate"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=Path, default=TUT / "data")
-    ap.add_argument("--out", type=Path, default=TUT / "outputs" / "03_psd")
+    ap.add_argument("--data", type=Path, default=EXAMPLE / "data")
+    ap.add_argument("--out", type=Path, default=EXAMPLE / "results" / "03_psd")
     ap.add_argument("--field", default="all")
     ap.add_argument("--method", default="periodogram", choices=["periodogram", "welch"])
     ap.add_argument("--boundary", type=float, nargs=2, default=None, metavar=("X_MM", "Y_MM"))

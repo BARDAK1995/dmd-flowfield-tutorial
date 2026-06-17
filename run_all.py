@@ -44,7 +44,7 @@ def main() -> None:
         run(["scripts/05_reconstruct_from_modes.py", "--field", args.field, "--pairs", "3",
              "--x-min-mm", "40", "--x-max-mm", "100", "--y-max-mm", "2.5",
              "--display-y-max-mm", "2.0"])
-    print("\n[all done] see ./outputs/")
+    print("\n[all done] see ./examples/HypersonicFlowOverPlate/results/")
 
 
 if __name__ == "__main__":

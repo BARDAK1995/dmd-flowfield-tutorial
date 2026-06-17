@@ -47,12 +47,20 @@ DMD_Tutorial/
 │   ├── 04_dmd_analysis.py         # full DMD with structured outputs
 │   └── 05_reconstruct_from_modes.py  # rebuild the flow from a few modes
 ├── tools/
-│   └── prepare_tutorial_data.py   # how data/ was produced from a full DSMC case
-└── data/                          # the shipped dataset (versioned with Git LFS)
-    ├── number_density_m3.npy      # (n_time, n_y, n_x) float32, m⁻³
-    ├── pressure_Pa.npy            # (n_time, n_y, n_x) float32, Pa
-    └── dataset_metadata.json      # grid (mm), timestep (s), units, forcing, freestream
+│   └── prepare_tutorial_data.py   # how the data was produced from a full DSMC case
+└── examples/
+    └── HypersonicFlowOverPlate/   # a complete worked example (the default case)
+        ├── data/                  # the dataset (versioned with Git LFS)
+        │   ├── number_density_m3.npy   # (n_time, n_y, n_x) float32, m⁻³
+        │   ├── pressure_Pa.npy         # (n_time, n_y, n_x) float32, Pa
+        │   └── dataset_metadata.json   # grid (mm), timestep (s), units, forcing
+        ├── results/               # all generated outputs, organized by step
+        └── README.md              # describes the case and its results
 ```
+
+The scripts default to this example, so a bare `python scripts/04_dmd_analysis.py`
+reads `examples/HypersonicFlowOverPlate/data` and writes into that example's
+`results/`. Point `--data` and `--out` elsewhere to run on another case.
 
 ## Install and run
 
@@ -77,7 +85,9 @@ python scripts/05_reconstruct_from_modes.py --field pressure --pairs 3 \
        --x-min-mm 40 --x-max-mm 100 --y-max-mm 2.5
 ```
 
-All outputs land in `outputs/<step>/`.
+All outputs land in `examples/HypersonicFlowOverPlate/results/<step>/`, and a
+full set of them is already committed there so you can browse the example
+without running anything.
 
 **Animation format.** Movies are written as MP4 when `ffmpeg` is available (about
 3 to 5 MB each), and fall back to GIF otherwise. The fluctuation movies and the
@@ -90,8 +100,10 @@ cloning. A copy also lives on Box at
 https://uofi.app.box.com/folder/391220154153 if you ever want to grab the files
 directly. The 501-snapshot count is deliberate. It is the amount that gives a
 clean DMD of the 250 kHz tone, because fewer snapshots smear the mode across
-nearby frequencies. If you have the source DSMC case you can regenerate `data/`
-yourself with `tools/prepare_tutorial_data.py`, described at the end.
+nearby frequencies. The data lives in
+`examples/HypersonicFlowOverPlate/data/`. If you have the source DSMC case you
+can regenerate it yourself with `tools/prepare_tutorial_data.py`, described at
+the end.
 
 ## How the data is structured (the one thing to understand)
 
@@ -190,7 +202,7 @@ the field stays real:
 
 ```python
 from dmdkit import dataset, dmd
-f   = dataset.load_field("data", "pressure").crop(40, 100, None, 2.5)
+f   = dataset.load_field("examples/HypersonicFlowOverPlate/data", "pressure").crop(40, 100, None, 2.5)
 res = dmd.run_dmd(f.data, f.dt_seconds, f.x_mm, f.y_mm, units=f.units, symbol=f.symbol)
 
 cube = res.reconstruct([1, 3, 5], add_mean=True)      # full field from modes 1, 3, 5

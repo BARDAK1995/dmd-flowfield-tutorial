@@ -26,12 +26,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dmdkit import dataset, fields, viz
 
 TUT = Path(__file__).resolve().parents[1]
+EXAMPLE = TUT / "examples" / "HypersonicFlowOverPlate"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", type=Path, default=TUT / "data")
-    ap.add_argument("--out", type=Path, default=TUT / "outputs" / "01_animation")
+    ap.add_argument("--data", type=Path, default=EXAMPLE / "data")
+    ap.add_argument("--out", type=Path, default=EXAMPLE / "results" / "01_animation")
     ap.add_argument("--field", default="all", help="'all', or a single field key")
     ap.add_argument("--fps", type=int, default=15)
     ap.add_argument("--step", type=int, default=1, help="use every Nth snapshot")

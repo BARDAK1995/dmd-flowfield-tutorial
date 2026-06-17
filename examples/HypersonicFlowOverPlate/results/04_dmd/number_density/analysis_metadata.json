@@ -1,0 +1,49 @@
+{
+  "field": "number_density",
+  "variable_name": "Number density",
+  "units": "m^-3",
+  "cube_shape": [
+    501,
+    50,
+    1201
+  ],
+  "crop_mm": {
+    "x": [
+      40.041631973355535,
+      99.99167360532888
+    ],
+    "y": [
+      0.025,
+      2.475
+    ]
+  },
+  "dt_seconds": 1.0000000000000001e-07,
+  "sampling_frequency_hz": 10000000.0,
+  "step_first": 750000,
+  "step_interval": 100,
+  "detrend": "mean",
+  "moving_average_window": 300,
+  "svd_rank": 30,
+  "exact": true,
+  "opt": true,
+  "forward_backward": true,
+  "sorted_eigs": "abs",
+  "n_positive_modes": 15,
+  "snapshot_matrix_condition_number": 48503612552920.06,
+  "dominant_mode": {
+    "rank": 1,
+    "full_index": 3,
+    "frequency_hz": 349531.5717018995,
+    "frequency_khz": 349.5315717018995,
+    "growth_rate_per_s": -3253.1206763270247,
+    "amplitude_abs": 5.2155327136716386e+23,
+    "normalized_amplitude": 1.0,
+    "coefficient_rms": 4.818799485801572e+23,
+    "wavelength_mm": 2.2222222222222223,
+    "phase_speed_mps": 776.7368260042213,
+    "eigenvalue_real": 0.9756634773275714,
+    "eigenvalue_imag": 0.21778513834463886,
+    "mode_real_abs_max": 1.0935296599037753e+22,
+    "mode_amplitude_max": 1.0935296599037753e+22
+  }
+}
