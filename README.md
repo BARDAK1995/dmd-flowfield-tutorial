@@ -14,16 +14,18 @@ one-file description of the grid and the timestep, and everything else follows.
 
 ## The example data, in one paragraph
 
-The shipped dataset is an excerpt of a Direct Simulation Monte Carlo (DSMC)
-simulation of a Mach 6 nitrogen flow over a flat plate. A small patch of the
-wall, from `x = 59.5` to `60.5 mm`, oscillates with periodic blowing and suction
-at 250 kHz. It acts as an actuator that excites a travelling instability wave,
-the second (Mack) mode, in the boundary layer. We ship two fields over the
-converged, statistically steady tail of the run: number density in m⁻³ and
-pressure in Pa, both on a 60 by 2402 grid. Because the forcing frequency is
-known, this is an ideal teaching case. The DMD should recover a dominant mode
-right at 250 kHz, and rebuilding the flow from just that one conjugate pair
-already reproduces the travelling wave.
+The shipped dataset is the unforced Mach 6 nitrogen flat-plate reference case
+from a Direct Simulation Monte Carlo (DSMC) run, the same case the second-mode
+analysis in the paper was built on. There is no actuator and no external forcing,
+so the boundary layer grows a natural second-mode (Mack mode) instability, the
+dominant hypersonic transition mechanism. We ship two fields over the last 1000
+snapshots (the converged, statistically steady tail): number density in m⁻³ and
+pressure in Pa, on a 63 by 1501 grid covering x = 40 to 100 mm and y = 0 to
+2.5 mm. The teaching goal is to pull that instability straight out of the data:
+the DMD recovers a broadband cluster of second-mode frequencies around 280 kHz,
+all travelling near 0.9 of the freestream speed with a wavelength near 3 mm, and
+rebuilding the flow from a few conjugate mode-pairs reproduces the travelling
+wave.
 
 ## Folder layout
 
@@ -47,7 +49,7 @@ DMD_Tutorial/
 │   ├── 04_dmd_analysis.py         # full DMD with structured outputs
 │   └── 05_reconstruct_from_modes.py  # rebuild the flow from a few modes
 ├── tools/
-│   └── prepare_tutorial_data.py   # how the data was produced from a full DSMC case
+│   └── prepare_reference_data.py  # how the data was produced from the reference run
 └── examples/
     └── HypersonicFlowOverPlate/   # a complete worked example (the default case)
         ├── data/                  # the dataset (versioned with Git LFS)
@@ -93,16 +95,13 @@ without running anything.
 3 to 5 MB each), and fall back to GIF otherwise. The fluctuation movies and the
 reconstruction comparison are the visual payoff.
 
-**The data.** The dataset is about 578 MB total, two `float32` cubes of 501
-snapshots each on a 60 by 2402 grid. It is versioned with Git LFS rather than
-committed as plain blobs, which is why you need Git LFS installed before
-cloning. A copy also lives on Box at
-https://uofi.app.box.com/folder/391220154153 if you ever want to grab the files
-directly. The 501-snapshot count is deliberate. It is the amount that gives a
-clean DMD of the 250 kHz tone, because fewer snapshots smear the mode across
-nearby frequencies. The data lives in
-`examples/HypersonicFlowOverPlate/data/`. If you have the source DSMC case you
-can regenerate it yourself with `tools/prepare_tutorial_data.py`, described at
+**The data.** The dataset is about 756 MB total, two `float32` cubes of 1000
+snapshots each on a 63 by 1501 grid. It is versioned with Git LFS rather than
+committed as plain blobs, which is why you need Git LFS installed before cloning.
+It lives in `examples/HypersonicFlowOverPlate/data/`. The 1000-snapshot tail is
+the converged, statistically steady part of the run, which is what gives a clean
+DMD of the second mode. If you have the source DSMC reference case you can
+regenerate the data yourself with `tools/prepare_reference_data.py`, described at
 the end.
 
 ## How the data is structured (the one thing to understand)
@@ -151,9 +150,9 @@ the RMS, so a slow residual transient is not mistaken for unsteadiness.
 ### PSD convention
 One-sided, density-scaled (`[signal]²/Hz`), with a Hann window and a linear
 detrend, at `fs = 1/dt`. The spectrum integrates back to the variance, so
-`RMS = sqrt(∫ PSD df)`. The boundary probe shows a sharp peak at the forcing
-frequency, while the freestream probe shows a flat broadband floor, which here
-is DSMC statistical scatter.
+`RMS = sqrt(∫ PSD df)`. The boundary probe carries the second-mode instability
+energy across its band, while the freestream probe shows a flat broadband floor,
+which here is DSMC statistical scatter.
 
 ### DMD convention
 The chain is detrend, then SVD, then forward-backward exact DMD at rank 30 with
@@ -184,9 +183,12 @@ field(t) ≈ mean + Σ over selected pairs of  φ_k · b_k · λ_k^t
 The toolkit finds the conjugate partner for you (`DmdResult.reconstruct`). The
 script sweeps from 1 up to `max_pairs`, reports the relative reconstruction
 error, and writes a side-by-side movie of the original fluctuation next to the
-reconstruction. For this forced case one or two conjugate pairs already
-reproduce the 250 kHz travelling wave, and the error drops sharply over the
-first few pairs.
+reconstruction. A few conjugate pairs already reproduce the second-mode
+travelling wave, and the error against the full coherent DMD model drops sharply
+over the first few pairs. Note that the error against the raw fluctuation stays
+high, because in an unforced DSMC run most of the instantaneous fluctuation
+energy is incoherent statistical noise; the reconstruction recovers the coherent
+part, which is the physics you care about.
 
 **Selecting any modes you like.** The reconstruction is not limited to the first
 N. You can rebuild from any subset of positive-frequency mode ranks:
@@ -213,15 +215,14 @@ for r in (1, 3, 5):                                   # see which modes you are 
 
 ## Provenance and regenerating the data
 
-`tools/prepare_tutorial_data.py` records exactly how `data/` was produced from a
-full DSMC case. It reads the solver input and output (`data.dan`, `code.dan`,
-`snap.data`, `surfaceMove.data`, `Prot0.dat`), selects the converged step
-window, subsamples in time down to a portable size, and converts raw particle
-counts to number density with `n = counts · FNUM / V_cell`. Re-run it to pick a
-different window or keep more snapshots:
+`tools/prepare_reference_data.py` records exactly how `data/` was produced from
+the reference run. It takes the last 1000 snapshots of the unforced case, fixes
+the axis order to (time, y, x), and calibrates each field to physical units by
+anchoring to the validated freestream (number density to 1.2e24 m⁻³ and pressure
+to 828 Pa). Re-run it to keep a different number of snapshots:
 
 ```bash
-python tools/prepare_tutorial_data.py --step-start 750000 --step-end 800000 --subsample 2
+python tools/prepare_reference_data.py --n-snapshots 1000
 ```
 
 ## Citation and acknowledgments

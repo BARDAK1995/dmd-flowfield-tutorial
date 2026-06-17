@@ -1,29 +1,36 @@
-# Example: hypersonic flow over a flat plate
+# Example: hypersonic flow over a flat plate (second-mode reference case)
 
-This is a complete worked example for the toolkit. It contains the data for one
+This is a complete worked example for the toolkit. It holds the data for one
 case and all of the analysis results produced from it, so you can browse the
 outputs here directly or regenerate them yourself.
 
 ## The case
 
 A Direct Simulation Monte Carlo (DSMC) run of a Mach 6 nitrogen flow over a flat
-plate. A short patch of the wall, from x = 59.5 to 60.5 mm, oscillates with
-periodic blowing and suction at 250 kHz. It acts as an actuator that excites a
-travelling second-mode (Mack mode) instability wave in the boundary layer.
-Because the forcing frequency is known, this is an ideal test: the analysis
-should recover a wave right at 250 kHz.
+plate. This is the unforced reference case that the second-mode analysis in the
+paper was built on. There is no wall actuator and no external forcing, so the
+boundary layer develops a naturally growing second-mode (Mack mode) instability,
+the dominant transition mechanism at hypersonic speeds. The point of the example
+is to recover that instability straight from the data.
 
-The data in `data/` is a trimmed, dimensionalized excerpt of the converged tail
-of that run.
+The data in `data/` is the last 1000 snapshots of the run, the converged and
+statistically steady tail, calibrated to physical units against the validated
+freestream of this case.
 
 | Property | Value |
 |----------|-------|
 | Fields | number density (m⁻³) and pressure (Pa) |
-| Array shape | (501, 60, 2402) = (time, y, x) |
-| Domain | x from 0 to 120 mm, y from 0 to 3 mm |
-| Snapshots | 501, from steps 750000 to 800000, kept every second frame |
+| Array shape | (1000, 63, 1501) = (time, y, x) |
+| Domain | x from 40 to 100 mm, y from 0 to 2.5 mm |
+| Snapshots | 1000 (the last 1000 of the run) |
 | Timestep | dt = 1e-7 s, so fs = 10 MHz and Nyquist = 5 MHz |
-| Forcing | wall actuator at x = 59.5 to 60.5 mm, 250 kHz, Vn = 100 m/s |
+| Freestream | Mach 6 N2, U = 860.6 m/s, T = 50 K, n = 1.2e24 m⁻³, p = 828 Pa |
+| Forcing | none (natural second-mode instability) |
+
+Number density was calibrated from raw particle counts and pressure from the raw
+sampled field, each anchored to the validated freestream (n = 1.2e24 m⁻³ and
+p = 828 Pa). The freestream check in `00_inspect` reads 1.198e24 m⁻³, within
+0.2 percent.
 
 ## How the results are organized
 
@@ -42,34 +49,38 @@ results/
 
 ## What the analysis finds
 
-The pressure DMD recovers a dominant mode at 251 kHz, right on the forcing
-frequency, with a phase speed of about 793 m/s and a streamwise wavelength of
-about 3.2 mm. The mode clearly emanates from the actuator near x = 60 mm and
-grows downstream.
+Because the instability is natural rather than driven, it is broadband. The DMD
+of pressure picks up a cluster of second-mode frequencies from roughly 210 to
+325 kHz, with the most energetic mode near 280 kHz. The paper's representative
+second mode near 247 kHz sits inside this band. Every mode in the cluster has a
+phase speed close to 800 m/s, about 0.9 of the freestream velocity, and a
+streamwise wavelength near 3 mm, which are the hallmarks of the second mode.
 
-![Dominant pressure mode at 251 kHz](results/04_dmd/pressure/modes/mode_01.png)
+![Dominant pressure mode near 280 kHz](results/04_dmd/pressure/modes/mode_01.png)
 
-The number density DMD is dominated instead by a 349.5 kHz mode, with 252 kHz a
-close second, which matches the production analysis of this case.
+The mode is concentrated near the wall and grows as it travels downstream, the
+classic picture of a spatially amplifying second-mode wavepacket. Number density
+shows the same band and the same phase speeds.
 
-The point spectra show the contrast that motivates the whole study. The boundary
-probe has a sharp tone at the forcing frequency, while the freestream probe is a
-flat broadband floor, which here is DSMC statistical scatter.
+The point spectra contrast a probe inside the boundary layer with one in the
+free stream. The boundary probe carries the second-mode energy across its band,
+while the freestream probe is a flat broadband floor, which here is DSMC
+statistical scatter.
 
 ![Pressure PSD, boundary vs. freestream](results/03_psd/figures/psd_pressure.png)
 
 Reconstructing the pressure field from only the first few conjugate mode-pairs
-already reproduces the travelling wave. The raw fluctuation is noisy because most
-of the instantaneous fluctuation energy in DSMC is incoherent noise (the coherent
-fraction here is about 0.45), so the reconstruction is best read as the coherent
-wave extracted from that noise.
+recovers the travelling wave. The raw fluctuation is very noisy because in an
+unforced DSMC run most of the instantaneous fluctuation energy is incoherent
+statistical noise, so the reconstruction is best read as the coherent instability
+extracted from that noise. The error against the full coherent DMD model drops
+quickly with the first few pairs.
 
 ![Reconstruction from a few modes](results/05_reconstruction/pressure/figures/snapshot_compare.png)
 
 ## Regenerating these results
 
-The scripts default to this example, so from the repository root you can simply
-run:
+The scripts default to this example, so from the repository root you can run:
 
 ```bash
 python run_all.py
@@ -78,9 +89,9 @@ python run_all.py
 or run any single step, for example:
 
 ```bash
-python scripts/04_dmd_analysis.py --field pressure --x-min-mm 40 --x-max-mm 100 --y-max-mm 2.5
-python scripts/05_reconstruct_from_modes.py --field pressure --pairs 3 \
-       --x-min-mm 40 --x-max-mm 100 --y-max-mm 2.5
+python scripts/04_dmd_analysis.py --field pressure
+python scripts/05_reconstruct_from_modes.py --field pressure --pairs 3
 ```
 
-Everything writes back into `results/`.
+Everything writes back into `results/`. The dataset itself was produced from the
+reference run by `tools/prepare_reference_data.py`.

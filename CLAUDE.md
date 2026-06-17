@@ -17,7 +17,7 @@ all case-specific scaffolding removed.
 
 - `dmdkit/` is the reusable library: `dataset`, `fields`, `psd`, `dmd`, `viz`, `io_utils`.
 - `scripts/` are the numbered tutorials, 00 through 05.
-- `tools/prepare_tutorial_data.py` shows how the data was produced from a full DSMC case.
+- `tools/prepare_reference_data.py` shows how the data was produced from the unforced reference run.
 - `examples/HypersonicFlowOverPlate/` is a complete worked example: `data/` plus a
   full set of committed `results/`. The scripts default to this example.
 

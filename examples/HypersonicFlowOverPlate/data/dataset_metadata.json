@@ -1,37 +1,35 @@
 {
-  "title": "Hypersonic flat-plate DSMC: portable DMD tutorial dataset",
-  "description": "Trimmed, time-subsampled, dimensionalized excerpt of a Mach ~6 N2 flat-plate boundary layer forced by a localized wall actuator. Two fields: number density and pressure.",
+  "title": "Hypersonic flat-plate DSMC: second-mode reference case",
+  "description": "Last 1000 snapshots of the unforced Mach 6 N2 flat-plate reference run, the case the paper's second-mode DMD analysis was built on. Fields calibrated to physical units against the validated freestream. Two fields: number density and pressure.",
   "provenance": {
-    "source_case": "flatplate120x3_600k_800k_AVS250kHz_Vn100ms",
-    "original_first_step": 600050,
-    "original_interval_steps": 50,
-    "original_tau_seconds": 1e-09,
+    "source_case": "2ndMode_refDSMC/Datas/expensive_Ref (unforced reference)",
     "original_n_snapshots": 4000,
-    "selected_step_start": 750000,
-    "selected_step_end": 800000,
-    "time_subsample_factor": 2,
-    "x_crop_mm": [
-      null,
-      null
-    ]
+    "kept_last": 1000,
+    "stored_axis_order": "(time, x, y), transposed here to (time, y, x)",
+    "calibration": {
+      "number_density": "n = counts * 1.735210e+20 (anchored to n_inf = 1.200e+24)",
+      "pressure": "p = P_raw * 2.350199e+00 (anchored to p_inf = 828.0 Pa)",
+      "freestream_counts": 6915.5908315,
+      "freestream_P_raw": 352.3105545345
+    }
   },
   "grid": {
-    "x_min_mm": 0.0,
-    "x_max_mm": 120.0,
+    "x_min_mm": 40.0,
+    "x_max_mm": 100.0,
     "y_min_mm": 0.0,
-    "y_max_mm": 3.0,
-    "nx": 2402,
-    "ny": 60,
+    "y_max_mm": 2.5,
+    "nx": 1501,
+    "ny": 63,
     "note": "uniform cell centres in mm"
   },
   "time": {
-    "n_snapshots": 501,
-    "step_first": 750000,
-    "step_interval": 100,
-    "tau_seconds": 1e-09,
-    "dt_seconds": 1.0000000000000001e-07,
+    "n_snapshots": 1000,
+    "step_first": 0,
+    "step_interval": 1,
+    "dt_seconds": 1e-07,
     "sampling_frequency_hz": 10000000.0,
-    "nyquist_hz": 5000000.0
+    "nyquist_hz": 5000000.0,
+    "note": "step_first/step_interval are nominal snapshot indices; dt is physical"
   },
   "fields": {
     "number_density": {
@@ -50,41 +48,28 @@
     }
   },
   "forcing": {
-    "type": "localized wall actuator (periodic blowing/suction)",
-    "x_min_mm": 59.5,
-    "x_max_mm": 60.5,
-    "frequency_hz": 250000.0,
-    "tangential_velocity_mps": 0.0,
-    "normal_velocity_mps": 100.0
+    "type": "none (unforced reference; natural second-mode instability)"
   },
   "freestream": {
     "gas": "N2",
-    "mach": 5.969724889777065,
+    "mach": 5.97,
     "U_mps": 860.6,
     "T_K": 50.0,
     "number_density_m3": 1.2e+24,
-    "mass_density_kgm3": 0.0558,
-    "pressure_Pa": 828.32,
-    "molecular_mass_kg": 4.6500001e-26,
-    "gas_constant_J_kgK": 296.8903,
+    "pressure_Pa": 828.0,
+    "molecular_mass_kg": 4.65e-26,
+    "gas_constant_J_kgK": 296.89,
     "gamma": 1.4
-  },
-  "conversion": {
-    "fnum": 85250000000.0,
-    "cell_volume_m3": 2.4979184013322235e-09,
-    "counts_to_number_density_factor": 3.4128416666666664e+19,
-    "molecular_mass_kg": 4.6500001e-26,
-    "note": "n = counts * FNUM / V_cell;  rho = n * molecular_mass"
   },
   "suggested_probes": {
     "boundary": {
-      "x_mm": 60.8,
+      "x_mm": 70.0,
       "y_mm": 0.5,
-      "note": "just downstream of the actuator, inside the boundary layer"
+      "note": "inside the boundary layer, mid-plate"
     },
     "freestream": {
-      "x_mm": 30.0,
-      "y_mm": 2.875,
+      "x_mm": 50.0,
+      "y_mm": 2.4,
       "note": "top of the domain, outside the boundary layer"
     }
   }

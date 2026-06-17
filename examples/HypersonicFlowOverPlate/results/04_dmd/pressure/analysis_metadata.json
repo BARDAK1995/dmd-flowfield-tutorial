@@ -3,24 +3,24 @@
   "variable_name": "Pressure",
   "units": "Pa",
   "cube_shape": [
-    501,
-    50,
-    1201
+    1000,
+    63,
+    1501
   ],
   "crop_mm": {
     "x": [
-      40.041631973355535,
-      99.99167360532888
+      40.01998667554963,
+      99.98001332445037
     ],
     "y": [
-      0.025,
-      2.475
+      0.01984126984126984,
+      2.4801587301587302
     ]
   },
-  "dt_seconds": 1.0000000000000001e-07,
+  "dt_seconds": 1e-07,
   "sampling_frequency_hz": 10000000.0,
-  "step_first": 750000,
-  "step_interval": 100,
+  "step_first": 0,
+  "step_interval": 1,
   "detrend": "mean",
   "moving_average_window": 300,
   "svd_rank": 30,
@@ -28,22 +28,22 @@
   "opt": true,
   "forward_backward": true,
   "sorted_eigs": "abs",
-  "n_positive_modes": 14,
-  "snapshot_matrix_condition_number": 80296948217759.73,
+  "n_positive_modes": 15,
+  "snapshot_matrix_condition_number": 42760027659467.57,
   "dominant_mode": {
     "rank": 1,
-    "full_index": 21,
-    "frequency_hz": 251268.4268460526,
-    "frequency_khz": 251.26842684605262,
-    "growth_rate_per_s": 3111.1010757676677,
-    "amplitude_abs": 596.5921988094145,
+    "full_index": 7,
+    "frequency_hz": 279814.6729444812,
+    "frequency_khz": 279.8146729444812,
+    "growth_rate_per_s": -2671.5120062815236,
+    "amplitude_abs": 445.8536865804608,
     "normalized_amplitude": 1.0,
-    "coefficient_rms": 646.1516312550091,
-    "wavelength_mm": 3.1578947368421053,
-    "phase_speed_mps": 793.4792426717452,
-    "eigenvalue_real": 0.9878706411429151,
-    "eigenvalue_imag": 0.15727050010155516,
-    "mode_real_abs_max": 15.954281374293256,
-    "mode_amplitude_max": 15.954281374293256
+    "coefficient_rms": 392.4786754331178,
+    "wavelength_mm": 2.8571428571428577,
+    "phase_speed_mps": 799.4704941270893,
+    "eigenvalue_real": 0.9843217104580241,
+    "eigenvalue_imag": 0.17486169001197166,
+    "mode_real_abs_max": 6.674799538299081,
+    "mode_amplitude_max": 6.674799538299083
   }
 }
