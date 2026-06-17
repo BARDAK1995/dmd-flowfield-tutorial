@@ -1,10 +1,8 @@
 # Generated analysis outputs
 outputs/
 
-# Large shipped data arrays (regenerate with tools/prepare_tutorial_data.py).
-# NOTE: when sending this folder to collaborators, include data/ in the archive
-# even though it is git-ignored here.
-data/*.npy
+# The data arrays (data/*.npy) are versioned with Git LFS, not ignored.
+# A normal clone fetches them automatically when Git LFS is installed.
 
 __pycache__/
 *.pyc
