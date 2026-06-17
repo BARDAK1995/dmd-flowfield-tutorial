@@ -9,8 +9,7 @@ authors:
   - family-names: Senkardesler
     given-names: Mert
 license: MIT
-# Update this once the public repository is created:
-repository-code: "https://github.com/<your-account>/dmd-flowfield-tutorial"
+repository-code: "https://github.com/BARDAK1995/dmd-flowfield-tutorial"
 keywords:
   - dynamic mode decomposition
   - DMD
