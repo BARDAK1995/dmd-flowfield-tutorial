@@ -1,0 +1,109 @@
+cff-version: 1.2.0
+title: "Portable DMD Tutorial for DSMC / CFD Flow-Field Analysis"
+message: >-
+  If you use this toolkit, please cite it together with the underlying DMD
+  methods (Schmid 2010; Tu et al. 2014; Dawson et al. 2016) and the PyDMD
+  software (Demo et al. 2018; Ichinaga et al. 2024) on which it builds.
+type: software
+authors:
+  - family-names: Senkardesler
+    given-names: Mert
+license: MIT
+# Update this once the public repository is created:
+repository-code: "https://github.com/<your-account>/dmd-flowfield-tutorial"
+keywords:
+  - dynamic mode decomposition
+  - DMD
+  - DSMC
+  - hypersonic boundary layer
+  - second mode
+  - flow-field analysis
+references:
+  - type: article
+    title: "Dynamic mode decomposition of numerical and experimental data"
+    authors:
+      - family-names: Schmid
+        given-names: Peter J.
+    journal: "Journal of Fluid Mechanics"
+    volume: 656
+    start: 5
+    end: 28
+    year: 2010
+    doi: 10.1017/S0022112010001217
+    notes: "Origin of DMD for fluid flows."
+  - type: article
+    title: "On dynamic mode decomposition: theory and applications"
+    authors:
+      - family-names: Tu
+        given-names: Jonathan H.
+      - family-names: Rowley
+        given-names: Clarence W.
+      - family-names: Luchtenburg
+        given-names: Dirk M.
+      - family-names: Brunton
+        given-names: Steven L.
+      - family-names: Kutz
+        given-names: J. Nathan
+    journal: "Journal of Computational Dynamics"
+    volume: 1
+    issue: 2
+    start: 391
+    end: 421
+    year: 2014
+    doi: 10.3934/jcd.2014.1.391
+    notes: "Exact DMD (the variant used here)."
+  - type: article
+    title: >-
+      Characterizing and correcting for the effect of sensor noise in the
+      dynamic mode decomposition
+    authors:
+      - family-names: Dawson
+        given-names: Scott T. M.
+      - family-names: Hemati
+        given-names: Maziar S.
+      - family-names: Williams
+        given-names: Matthew O.
+      - family-names: Rowley
+        given-names: Clarence W.
+    journal: "Experiments in Fluids"
+    volume: 57
+    year: 2016
+    doi: 10.1007/s00348-016-2127-7
+    notes: "Forward-backward DMD noise correction (forward_backward=True here)."
+  - type: article
+    title: "PyDMD: Python Dynamic Mode Decomposition"
+    authors:
+      - family-names: Demo
+        given-names: Nicola
+      - family-names: Tezzele
+        given-names: Marco
+      - family-names: Rozza
+        given-names: Gianluigi
+    journal: "Journal of Open Source Software"
+    volume: 3
+    issue: 22
+    start: 530
+    year: 2018
+    doi: 10.21105/joss.00530
+  - type: article
+    title: "PyDMD: A Python package for robust dynamic mode decomposition"
+    authors:
+      - family-names: Ichinaga
+        given-names: Sara M.
+      - family-names: Andreuzzi
+        given-names: Francesco
+      - family-names: Demo
+        given-names: Nicola
+      - family-names: Tezzele
+        given-names: Marco
+      - family-names: Lapo
+        given-names: Karl
+      - family-names: Rozza
+        given-names: Gianluigi
+      - family-names: Brunton
+        given-names: Steven L.
+      - family-names: Kutz
+        given-names: J. Nathan
+    journal: "Journal of Machine Learning Research"
+    year: 2024
+    notes: "arXiv:2402.07463"
