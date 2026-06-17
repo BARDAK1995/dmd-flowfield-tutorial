@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-run_all.py -- run the whole tutorial end to end.
+run_all.py runs the whole tutorial end to end.
 
-Executes scripts 00-05 in order with sensible defaults so you can confirm the
-environment works and see every output produced in one go.
+It executes scripts 00 through 05 in order with sensible defaults, so you can
+confirm the environment works and see every output produced in one go.
 
-    python run_all.py                  # full run (includes GIF animations)
-    python run_all.py --quick          # skip the slow animation scripts (01, 05 gifs)
+    python run_all.py                  # full run, including the animations
+    python run_all.py --quick          # skip the slow animation scripts (01 and 05)
 
 Outputs land in ./outputs/.
 """

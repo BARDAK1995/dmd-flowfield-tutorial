@@ -1,24 +1,25 @@
 """
-psd.py -- point power-spectral density (PSD).
+psd.py, point power-spectral density (PSD).
 
-Given a time series sampled at fixed dt, where is its energy in frequency?  This
-is how you tell a *tone* (a sharp peak -- e.g. a forced or resonant instability)
-from *broadband noise* (a flat floor -- e.g. DSMC statistical scatter in the
-free stream).
+Take a time series sampled at a fixed dt and ask where its energy sits in
+frequency. That is how you tell a tone (a sharp peak, such as a forced or
+resonant instability) apart from broadband noise (a flat floor, such as DSMC
+statistical scatter in the free stream).
 
 Conventions (matching the reference pipeline):
 
 * sampling frequency  fs = 1 / dt
-* one-sided PSD with **density** scaling  -> units are [signal]^2 / Hz
-* a Hann window and a **linear** detrend are applied inside the estimator
+* one-sided PSD with density scaling, so units are [signal]^2 / Hz
+* a Hann window and a linear detrend are applied inside the estimator
 * two estimators are offered:
       - "periodogram" : full-resolution single-segment estimate (df = fs / N)
       - "welch"       : segment-averaged estimate (smoother, lower variance)
 
-The integral of the one-sided PSD over frequency returns the variance, so
-``rms_from_psd`` recovers the time-domain RMS:  sqrt( integral PSD df ).
+Integrating the one-sided PSD over frequency gives back the variance, so
+``rms_from_psd`` recovers the time-domain RMS: sqrt( integral PSD df ).
 
-Frequencies are returned in Hz; helpers convert to kHz for plotting/reporting.
+Frequencies come back in Hz, and helpers convert to kHz for plotting and
+reporting.
 """
 from __future__ import annotations
 
@@ -35,11 +36,12 @@ def point_psd(series: np.ndarray, dt_seconds: float, *,
     """
     One-sided PSD of a 1-D time series.
 
-    Returns (frequency_hz, psd).  ``psd`` has units [series]^2 / Hz.
+    Returns (frequency_hz, psd), where ``psd`` has units [series]^2 / Hz.
 
     method = "periodogram" : single segment, finest frequency resolution.
     method = "welch"       : averaged segments (set ``nperseg``, default N//8),
-                             trades resolution for a smoother, lower-variance PSD.
+                             which trades resolution for a smoother,
+                             lower-variance PSD.
     """
     series = np.asarray(series, dtype=np.float64)
     fs = 1.0 / float(dt_seconds)

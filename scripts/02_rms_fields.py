@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-02_rms_fields.py -- where does the flow fluctuate?
+02_rms_fields.py: where does the flow fluctuate?
 
 The RMS field is the root-mean-square of the fluctuation at every grid point,
-after removing a least-squares line in time (so a slow residual drift is not
-counted as unsteadiness).  Bright regions = strong unsteady activity; for a
-forced/instability flow this lights up the wave packet inside the shear/boundary
-layer.
+taken after we remove a least-squares line in time so that a slow residual
+drift does not get counted as unsteadiness. Bright regions mean strong unsteady
+activity, and for a forced or instability flow this lights up the wave packet
+inside the shear or boundary layer.
 
 Outputs per field:
     figures/rms_<field>.png      RMS map (with the time-mean alongside)
-    tables/rms_summary.csv       min/mean/max/p99 of each RMS field
+    tables/rms_summary.csv       min, mean, max, and p99 of each RMS field
 
 Usage:
     python scripts/02_rms_fields.py

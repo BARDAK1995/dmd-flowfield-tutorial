@@ -1,12 +1,12 @@
 """
-viz.py -- plotting and animation helpers.
+viz.py: plotting and animation helpers.
 
-Everything renders through a non-interactive backend so the scripts run head-less
-(on a cluster, in CI, over SSH).  Font sizes obey journal minimums:
+Everything renders through a non-interactive backend so the scripts run headless
+(on a cluster, in CI, over SSH). Font sizes obey journal minimums:
 labels >= 14 pt, ticks >= 12 pt, titles >= 16 pt.
 
-Animations are written as GIFs through Matplotlib's Pillow writer, which needs no
-external binaries (ffmpeg-free), so a collaborator can reproduce them anywhere.
+Animations can fall back to GIFs written through Matplotlib's Pillow writer, which
+needs no external binaries, so a collaborator can reproduce them anywhere.
 """
 from __future__ import annotations
 
@@ -21,13 +21,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation, FFMpegWriter, PillowWriter, writers
 
-# Prefer MP4 (ffmpeg) -- ~20x smaller than GIF for wide colormap movies.
+# Prefer MP4 (ffmpeg), which is roughly 20x smaller than GIF for wide colormap movies.
 # Fall back to a size-limited GIF if ffmpeg is unavailable.
 _HAS_FFMPEG = "ffmpeg" in writers.list()
 
 
 def _save_anim(anim, out_path: Path, fps: int, dpi: int):
-    """Save an animation as .mp4 (ffmpeg) if possible, else a lean .gif."""
+    """Save an animation as an .mp4 (ffmpeg) when possible, otherwise a lean .gif."""
     out_path = Path(out_path)
     if _HAS_FFMPEG:
         mp4 = out_path.with_suffix(".mp4")
@@ -114,7 +114,8 @@ def plot_psd(curves: List[dict], out_path: Path, *, units_symbol: str, units: st
              title: str, mark_khz: Sequence[float] = (), xlim_khz=None) -> None:
     """
     Overlay several PSD curves on one semilog-y axis.
-    Each curve dict: {f_khz, psd, label, color?, linestyle?, linewidth?}.
+    Each curve is a dict with keys: f_khz, psd, label, and optionally color,
+    linestyle, and linewidth.
     """
     configure()
     fig, ax = plt.subplots(figsize=(10.0, 5.0), constrained_layout=True)
@@ -179,7 +180,7 @@ def plot_mode(real_map: np.ndarray, amp_map: np.ndarray, x_mm, y_mm, *,
 
 
 # --------------------------------------------------------------------------- #
-# Animations (GIF via Pillow -- no ffmpeg required)
+# Animations (GIF via Pillow when ffmpeg is not available)
 # --------------------------------------------------------------------------- #
 def _frame_limits(cube: np.ndarray, symmetric: bool, robust: float = 0.995):
     if symmetric:
@@ -226,7 +227,7 @@ def animate_pair(cube_left: np.ndarray, cube_right: np.ndarray, x_mm, y_mm, out_
                  cmap: str = "RdBu_r", symmetric: bool = True, fps: int = 15, step: int = 1,
                  dpi: int = 95, times_s: np.ndarray | None = None,
                  display_y_max_mm: float | None = None):
-    """Side-by-side movie, e.g. original fluctuation vs. DMD reconstruction."""
+    """Stacked movie, for example the original fluctuation against its DMD reconstruction."""
     configure()
     frames = range(0, min(cube_left.shape[0], cube_right.shape[0]), step)
     vmin, vmax = _frame_limits(np.concatenate([cube_left, cube_right]), symmetric)

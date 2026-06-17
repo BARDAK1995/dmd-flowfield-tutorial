@@ -1,16 +1,17 @@
 """
-fields.py -- time-mean, RMS fields, and fluctuation cubes.
+fields.py: time-mean, RMS fields, and fluctuation cubes.
 
-These are the "what does the flow look like, and where does it fluctuate"
-diagnostics.  Two conventions matter and are made explicit:
+These answer "what does the flow look like, and where does it fluctuate."
+Two conventions matter, so let's be explicit about them:
 
 * The *time-mean* field is a simple average over the time axis.
 
 * The *RMS field* is the root-mean-square of the fluctuation **after removing a
   least-squares straight line in time** at every grid point.  Removing a linear
-  trend (rather than just the mean) prevents a slow residual drift -- a not yet
-  fully converged transient -- from masquerading as turbulence/instability
-  energy.  This matches the reference pipeline's RMS definition.
+  trend (rather than just the mean) stops a slow residual drift, such as a
+  transient that has not fully converged yet, from masquerading as
+  turbulence or instability energy.  This matches the reference pipeline's RMS
+  definition.
 
 All functions take an (n_time, n_y, n_x) cube and return (n_y, n_x) maps, so they
 compose directly with :class:`dmdkit.dataset.Field`.
@@ -32,7 +33,7 @@ def linear_detrend(cube: np.ndarray) -> np.ndarray:
     """
     Remove the least-squares line along axis 0 (time) at every (y, x) point.
 
-    Vectorised closed form:  slope = <t, x> / <t, t>,  trend = mean + t * slope.
+    Vectorised closed form: slope = <t, x> / <t, t>, then trend = mean + t * slope.
     """
     cube = np.asarray(cube, dtype=np.float64)
     n = cube.shape[0]

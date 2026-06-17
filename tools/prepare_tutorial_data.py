@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-prepare_tutorial_data.py -- build the portable tutorial dataset.
+prepare_tutorial_data.py builds the portable tutorial dataset.
 
-This is the *provenance* script: it shows exactly how the shipped data/ folder
-was produced from a full DSMC case, and lets anyone regenerate or re-trim it.
+This is the provenance script. It shows exactly how the shipped data/ folder
+was produced from a full DSMC case, and it lets anyone regenerate or re-trim it.
 
-What it does
-------------
+What it does:
+
 1. Reads the source case's DSMC input/output files (data.dan, code.dan,
    snap.data, surfaceMove.data, Prot0.dat) to recover the grid, timestep,
    particle weight (FNUM), molecular mass, and forcing/freestream conditions.
 2. Loads the full N (particle-count) and P (pressure) snapshot cubes.
 3. Selects the converged steady tail (a step window) and optionally subsamples
-   in time -- the full arrays are GBs; the tutorial only needs a portable
+   in time. The full arrays are gigabytes, so the tutorial only needs a portable
    excerpt that still resolves the physics.
-4. Converts particle counts -> number density:   n = counts * FNUM / V_cell.
+4. Converts particle counts to number density: n = counts * FNUM / V_cell.
 5. Writes data/number_density_m3.npy, data/pressure_Pa.npy (float32) and
    data/dataset_metadata.json describing the grid, timestep and units.
 
-Defaults target the 250 kHz / Vn=100 m/s wall-actuator case, last 50k steps,
-time-subsampled x5 (-> 201 snapshots, dt = 2.5e-7 s, fs = 4 MHz).  The forcing
+Defaults target the 250 kHz, Vn=100 m/s wall-actuator case, last 50k steps,
+time-subsampled by 5x (so 201 snapshots, dt = 2.5e-7 s, fs = 4 MHz). The forcing
 frequency (250 kHz) sits well below Nyquist (2 MHz), so the excerpt is faithful.
 """
 from __future__ import annotations
@@ -39,7 +39,7 @@ DEFAULT_N2_MASS_KG = 4.65e-26
 
 
 # --------------------------------------------------------------------------- #
-# Tolerant text parsers for the DSMC input/output files
+# Forgiving text parsers for the DSMC input/output files
 # --------------------------------------------------------------------------- #
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
@@ -131,7 +131,7 @@ def main() -> None:
     ap.add_argument("--step-start", type=int, default=750000)
     ap.add_argument("--step-end", type=int, default=800000)
     ap.add_argument("--subsample", type=int, default=2,
-                    help="keep every Nth snapshot in time (2 -> ~501 snapshots, "
+                    help="keep every Nth snapshot in time (2 gives about 501 snapshots, "
                          "enough for a clean DMD of the 250 kHz tone)")
     ap.add_argument("--x-min-mm", type=float, default=None, help="optional streamwise crop")
     ap.add_argument("--x-max-mm", type=float, default=None)
@@ -148,7 +148,7 @@ def main() -> None:
 
     tau = data["tau_seconds"]
     macp = code.get("MACP", 50)
-    first_step = snap["step_marker_start"] + macp           # first stored snapshot step
+    first_step = snap["step_marker_start"] + macp           # step of the first stored snapshot
     interval = macp
 
     n_counts = np.load(npy_root / "N_snapshots.npy", mmap_mode="r")
@@ -156,7 +156,7 @@ def main() -> None:
     nt, ny, nx = (int(v) for v in n_counts.shape)
     last_step = first_step + (nt - 1) * interval
 
-    # -- time window selection (converged tail) ---------------------------- #
+    # pick the time window (the converged tail)
     if not (first_step <= args.step_start <= args.step_end <= last_step):
         raise SystemExit(f"requested {args.step_start}-{args.step_end} outside "
                          f"available {first_step}-{last_step}")
@@ -167,7 +167,7 @@ def main() -> None:
     shipped_interval = interval * args.subsample
     dt_seconds = shipped_interval * tau
 
-    # -- spatial (streamwise) crop ----------------------------------------- #
+    # crop in space along the streamwise direction
     x_edges = np.linspace(snap["x0_m"] * 1e3, snap["x1_m"] * 1e3, nx + 1)
     x_centers = 0.5 * (x_edges[:-1] + x_edges[1:])
     xmask = np.ones(nx, dtype=bool)
@@ -177,12 +177,12 @@ def main() -> None:
         xmask &= x_centers <= args.x_max_mm
     xi = np.flatnonzero(xmask)
     x_lo_mm, x_hi_mm = float(x_centers[xi[0]]), float(x_centers[xi[-1]])
-    # rebuild a clean uniform [min,max] grid description for the cropped block
+    # rebuild a clean, uniform [min, max] grid description for the cropped block
     grid_x_min = snap["x0_m"] * 1e3 + xi[0] * (snap["x1_m"] - snap["x0_m"]) * 1e3 / nx
     grid_x_max = snap["x0_m"] * 1e3 + (xi[-1] + 1) * (snap["x1_m"] - snap["x0_m"]) * 1e3 / nx
     nx_out = xi.size
 
-    # -- counts -> number density ------------------------------------------ #
+    # convert counts into number density
     dx_m = (snap["x1_m"] - snap["x0_m"]) / nx
     dy_m = (snap["y1_m"] - snap["y0_m"]) / ny
     cell_volume_m3 = dx_m * dy_m * args.depth_m
@@ -198,13 +198,13 @@ def main() -> None:
     print(f"[space]  {ny} x {nx_out} cells (x in [{grid_x_min:.3f},{grid_x_max:.3f}] mm)")
     print(f"[convert] n = counts * {counts_to_n:.6e}  (FNUM={fnum:.4e}, V={cell_volume_m3:.4e} m^3)")
 
-    # build trimmed arrays
+    # build the trimmed arrays
     n_out = (np.asarray(n_counts[sel][:, :, xi], dtype=np.float64) * counts_to_n).astype(np.float32)
     p_out = np.asarray(p_pa[sel][:, :, xi], dtype=np.float32)
     np.save(args.out / "number_density_m3.npy", n_out)
     np.save(args.out / "pressure_Pa.npy", p_out)
 
-    # freestream sanity check (top of domain, upstream of the actuator)
+    # freestream sanity check (top of the domain, upstream of the actuator)
     y_edges = np.linspace(snap["y0_m"], snap["y1_m"], ny + 1) * 1e3
     y_centers = 0.5 * (y_edges[:-1] + y_edges[1:])
     x_centers_out = 0.5 * (np.linspace(grid_x_min, grid_x_max, nx_out + 1)[:-1]
@@ -223,7 +223,7 @@ def main() -> None:
         mach = data["U_mps"] / a
 
     meta = {
-        "title": "Hypersonic flat-plate DSMC -- portable DMD tutorial dataset",
+        "title": "Hypersonic flat-plate DSMC: portable DMD tutorial dataset",
         "description": ("Trimmed, time-subsampled, dimensionalized excerpt of a "
                         "Mach ~6 N2 flat-plate boundary layer forced by a localized "
                         "wall actuator. Two fields: number density and pressure."),

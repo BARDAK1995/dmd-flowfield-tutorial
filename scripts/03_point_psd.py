@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-03_point_psd.py -- spectra at a boundary point vs. a freestream point.
+03_point_psd.py: spectra at a boundary point versus a freestream point.
 
-Picks two probes (from the metadata, override on the command line):
+Picks two probes (taken from the metadata, or overridden on the command line):
     * boundary  : just downstream of the actuator, inside the shear/boundary layer
     * freestream: top of the domain, in the undisturbed stream
 
-and compares their power-spectral densities.  The contrast is the whole point:
+and compares their power-spectral densities. The contrast is the whole point:
 
-    boundary  -> a sharp TONE at the instability/forcing frequency
-    freestream-> a flat broadband FLOOR (here: DSMC statistical scatter)
+    boundary   gives a sharp TONE at the instability/forcing frequency
+    freestream gives a flat broadband FLOOR (here, DSMC statistical scatter)
 
 For each field it overlays the two PSDs, marks the known forcing frequency,
-reports the peak frequency and the band/total RMS recovered from the spectrum.
+and reports the peak frequency along with the band and total RMS recovered
+from the spectrum.
 
 Usage:
     python scripts/03_point_psd.py
@@ -40,7 +41,7 @@ def main() -> None:
     ap.add_argument("--method", default="periodogram", choices=["periodogram", "welch"])
     ap.add_argument("--boundary", type=float, nargs=2, default=None, metavar=("X_MM", "Y_MM"))
     ap.add_argument("--freestream", type=float, nargs=2, default=None, metavar=("X_MM", "Y_MM"))
-    ap.add_argument("--fmax-khz", type=float, default=None, help="x-axis upper limit")
+    ap.add_argument("--fmax-khz", type=float, default=None, help="upper limit of the x-axis")
     args = ap.parse_args()
     viz.configure()
     dirs = io_utils.ensure_dirs(args.out)

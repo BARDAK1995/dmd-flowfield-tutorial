@@ -1,7 +1,7 @@
 """
-io_utils.py -- structured, self-describing outputs.
+io_utils.py, structured and self-describing outputs.
 
-Every analysis writes the *same* tidy bundle so a collaborator always knows where
+Every analysis writes the same tidy bundle, so a collaborator always knows where
 to look:
 
     <output>/figures/   PNG plots

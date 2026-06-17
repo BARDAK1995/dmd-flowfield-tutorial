@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-01_animate_field.py -- visualize the flow as a movie.
+01_animate_field.py: visualize the flow as a movie.
 
 Two GIFs per field:
-    * <field>_raw.gif     : the field itself (steady background + waves)
-    * <field>_fluct.gif   : the fluctuation only (time-mean removed) -- this is
-                            where you actually *see* the travelling instability /
-                            forced wave packet moving downstream.
+    * <field>_raw.gif     : the field itself (steady background plus waves)
+    * <field>_fluct.gif   : the fluctuation only (time-mean removed), which is
+                            where you actually *see* the travelling instability
+                            or forced wave packet moving downstream.
 
-The fluctuation movie is the honest picture of the unsteady physics and is the
-thing the DMD reconstruction (script 05) will be compared against.
+The fluctuation movie is the honest picture of the unsteady physics, and it is
+the thing the DMD reconstruction (script 05) will be compared against.
 
 Usage:
     python scripts/01_animate_field.py                       # both fields
@@ -32,7 +32,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", type=Path, default=TUT / "data")
     ap.add_argument("--out", type=Path, default=TUT / "outputs" / "01_animation")
-    ap.add_argument("--field", default="all", help="'all' or a field key")
+    ap.add_argument("--field", default="all", help="'all', or a single field key")
     ap.add_argument("--fps", type=int, default=15)
     ap.add_argument("--step", type=int, default=1, help="use every Nth snapshot")
     ap.add_argument("--display-y-max-mm", type=float, default=None)

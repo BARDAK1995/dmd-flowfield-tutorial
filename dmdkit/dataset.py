@@ -1,5 +1,5 @@
 """
-dataset.py -- load 2-D snapshot data and its physical metadata.
+dataset.py loads 2-D snapshot data and its physical metadata.
 
 The whole tutorial is built around one idea: a *case* is a stack of 2-D field
 snapshots plus a small JSON file that tells you the grid and the timestep.
@@ -8,8 +8,8 @@ snapshots plus a small JSON file that tells you the grid and the timestep.
     metadata     : dataset_metadata.json            grid (mm), timestep (s), units
 
 Given those two things, every physical quantity (time in seconds, frequency in
-kHz, a probe location in mm, a wavelength in mm) follows mechanically.  No
-boundary-layer edge, no Reynolds number, no stability theory -- purely
+kHz, a probe location in mm, a wavelength in mm) follows mechanically. There is
+no boundary-layer edge, no Reynolds number, and no stability theory, just plain
 dimensional bookkeeping.
 """
 from __future__ import annotations
@@ -32,7 +32,7 @@ class CaseMetadata:
     raw: Dict
     data_dir: Path
 
-    # grid (uniform cell centres, millimetres)
+    # grid (uniform cell centres, in millimetres)
     x_mm: np.ndarray = _dc_field(repr=False, default=None)  # type: ignore[assignment]
     y_mm: np.ndarray = _dc_field(repr=False, default=None)  # type: ignore[assignment]
 
@@ -50,7 +50,7 @@ class CaseMetadata:
         self.step_first = int(t["step_first"])
         self.step_interval = int(t["step_interval"])
 
-    # -- convenience accessors --------------------------------------------- #
+    # ==== convenience accessors ========================================== #
     @property
     def fs_hz(self) -> float:
         """Snapshot sampling frequency (Hz)."""
@@ -85,7 +85,7 @@ class Field:
     units: str                  # e.g. "Pa"
     meta: CaseMetadata
 
-    # -- shapes / axes ----------------------------------------------------- #
+    # ==== shapes / axes ================================================== #
     @property
     def n_time(self) -> int:
         return self.data.shape[0]
@@ -111,7 +111,7 @@ class Field:
         return (float(self.x_mm[0]), float(self.x_mm[-1]),
                 float(self.y_mm[0]), float(self.y_mm[-1]))
 
-    # -- point / window selection ----------------------------------------- #
+    # ==== point / window selection ====================================== #
     def nearest_ij(self, x_mm: float, y_mm: float) -> Tuple[int, int]:
         ix = int(np.argmin(np.abs(self.x_mm - x_mm)))
         iy = int(np.argmin(np.abs(self.y_mm - y_mm)))
@@ -176,8 +176,8 @@ def load_metadata(data_dir: str | Path) -> CaseMetadata:
 def load_field(data_dir: str | Path, key: str, mmap: bool = True) -> Field:
     """
     Load one field cube by its metadata key (e.g. ``"number_density"`` or
-    ``"pressure"``).  ``mmap=True`` keeps it memory-mapped so large arrays load
-    instantly; pass ``mmap=False`` to pull it fully into RAM.
+    ``"pressure"``). With ``mmap=True`` it stays memory-mapped, so large arrays
+    load instantly. Pass ``mmap=False`` to pull it fully into RAM.
     """
     meta = load_metadata(data_dir)
     spec = meta.field_spec(key)
@@ -208,7 +208,7 @@ def counts_to_number_density(counts: np.ndarray, fnum: float, cell_volume_m3: fl
 
     FNUM is the number of real molecules represented by one simulated molecule.
     (The tutorial ships number density directly, but this documents the chain
-    that produced it -- see tools/prepare_tutorial_data.py.)
+    that produced it; see tools/prepare_tutorial_data.py.)
     """
     return np.asarray(counts, dtype=np.float64) * float(fnum) / float(cell_volume_m3)
 

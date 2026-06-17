@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-00_inspect_data.py -- understand how the data is structured and dimensionalized.
+00_inspect_data.py: figure out how the data is structured and dimensionalized.
 
-Run this first.  It answers, for any case:
+Run this first. For any case, it answers:
 
-    * What is in the dataset?  (fields, shapes, units)
-    * How does a snapshot index become a physical time and a frequency?
-        dt = snapshot spacing [s];  fs = 1/dt;  Nyquist = fs/2;  df = fs/N.
-        => this is *the* reason DMD/PSD frequencies come out in kHz.
-    * Is the number-density field truly dimensional?  (cross-check vs. n_inf).
+    * What is in the dataset? (fields, shapes, units)
+    * How does a snapshot index turn into a physical time and a frequency?
+        dt = snapshot spacing [s], fs = 1/dt, Nyquist = fs/2, df = fs/N.
+        This is exactly why DMD/PSD frequencies come out in kHz.
+    * Is the number-density field truly dimensional? (we cross-check it against n_inf).
 
-It also saves the time-mean field and one representative fluctuation snapshot for
-each variable so you can see the steady background and the unsteady part.
+It also saves the time-mean field plus one representative fluctuation snapshot for
+each variable, so you can see the steady background and the unsteady part side by side.
 
 Usage:
     python scripts/00_inspect_data.py                 # uses ../data and ../outputs
@@ -65,7 +65,7 @@ def main() -> None:
     if meta.raw.get("forcing", {}).get("frequency_hz"):
         ff = meta.raw["forcing"]["frequency_hz"]
         print(f"  >> wall actuator forces at {ff/1e3:.0f} kHz "
-              f"({'below' if ff < meta.nyquist_hz else 'ABOVE'} Nyquist -- "
+              f"({'below' if ff < meta.nyquist_hz else 'ABOVE'} Nyquist, so it is "
               f"{'resolved' if ff < meta.nyquist_hz else 'ALIASED!'})")
     print()
 
@@ -86,14 +86,14 @@ def main() -> None:
         viz.plot_field(mean, f.x_mm, f.y_mm, title=f"Time-mean {f.name}",
                        units=f.units, out_path=args.out / f"mean_{key}.png",
                        cmap="inferno")
-        # one representative fluctuation snapshot (mid-record, mean removed)
+        # one representative fluctuation snapshot, taken mid-record with the mean removed
         fluct = f.data[f.n_time // 2] - mean
         viz.plot_field(fluct, f.x_mm, f.y_mm,
                        title=f"Representative {f.symbol}' fluctuation snapshot",
                        units=f.units, out_path=args.out / f"fluct_{key}.png",
                        cmap="RdBu_r", symmetric=True)
 
-    # dimensional cross-check on number density, if present
+    # if number density is in the dataset, cross-check that it is truly dimensional
     if "number_density" in meta.field_keys():
         f = dataset.load_field(args.data, "number_density")
         fs = meta.raw["suggested_probes"]["freestream"]

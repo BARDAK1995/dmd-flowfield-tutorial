@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-05_reconstruct_from_modes.py -- rebuild the flow from a few DMD modes.
+05_reconstruct_from_modes.py rebuilds the flow from a few DMD modes.
 
-The promise of DMD: a handful of modes should capture the coherent unsteady
-physics.  Here we *prove* it -- reconstruct the field from the first few
-positive-frequency modes and watch it reproduce the travelling wave.
+The promise of DMD is that a handful of modes should capture the coherent
+unsteady physics. Here we prove it by reconstructing the field from the first
+few positive-frequency modes and watching it reproduce the travelling wave.
 
 Key idea (conjugate pairs):
     Real data gives DMD eigenvalues in complex-conjugate pairs (a +f mode and its
-    -f twin).  To rebuild a *real* field you must keep both members of each pair.
+    -f twin). To rebuild a real field you must keep both members of each pair.
     So "reconstruct from the first N modes" here means the first N
-    positive-frequency modes *and* their conjugates -> 2N complex modes that
-    combine into a real field.  The toolkit handles the pairing automatically.
+    positive-frequency modes plus their conjugates, which gives 2N complex modes
+    that combine into a real field. The toolkit handles the pairing automatically.
 
     field(t) ~= mean  +  sum_{k in selected pairs} phi_k * b_k * lambda_k^t
 
@@ -19,7 +19,7 @@ Outputs:
     figures/reconstruction_error_vs_pairs.png   relative L2 error vs #pairs
     figures/snapshot_compare.png                original vs 1/2/3-pair reconstruction
     <field>_reconstruction_<N>pairs.gif         original fluctuation vs reconstruction
-    <field>_fullfield_<N>pairs.gif              mean + reconstruction (looks like the flow)
+    <field>_fullfield_<N>pairs.gif              mean plus reconstruction (looks like the flow)
     tables/reconstruction_error.csv
 
 Usage:
@@ -47,12 +47,12 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--field", default="pressure")
     ap.add_argument("--pairs", type=int, default=3,
-                    help="conjugate mode-pairs in the showcase reconstruction (2*pairs modes)")
+                    help="number of conjugate mode-pairs in the showcase reconstruction (gives 2*pairs modes)")
     ap.add_argument("--ranks", type=int, nargs="*", default=None, metavar="R",
                     help="reconstruct from these EXACT positive-frequency mode ranks "
                          "(1-based, e.g. --ranks 1 3 5). Overrides --pairs for the "
-                         "showcase; conjugate twins are added automatically.")
-    ap.add_argument("--max-pairs", type=int, default=6, help="largest #pairs in the error sweep")
+                         "showcase, and conjugate twins are added automatically.")
+    ap.add_argument("--max-pairs", type=int, default=6, help="largest number of pairs in the error sweep")
     ap.add_argument("--x-min-mm", type=float, default=None)
     ap.add_argument("--x-max-mm", type=float, default=None)
     ap.add_argument("--y-min-mm", type=float, default=None)
@@ -77,22 +77,22 @@ def main() -> None:
                          symbol=f.symbol, detrend=args.detrend, svd_rank=args.svd_rank)
     print(f"[recon] field '{args.field}'; {result.n_positive} positive-frequency modes available")
 
-    # reference fluctuation (what the reconstructed fluctuation should match)
+    # reference fluctuation, which is what the reconstructed fluctuation should match
     fluct = fields.fluctuation_cube(
         f.data, detrend=("linear" if args.detrend == "moving_average" else "mean"))
 
     # --- the coherent DMD model (ALL retained modes) --------------------- #
-    # A few modes can only ever rebuild the *coherent* part of the flow. In DSMC
-    # the raw fluctuation is coherent_wave + large incoherent statistical noise,
-    # so error-vs-raw-data plateaus at the noise floor. The meaningful question
-    # is "how fast do the first N pairs converge to the full coherent model?".
+    # A few modes can only ever rebuild the coherent part of the flow. In DSMC
+    # the raw fluctuation is coherent_wave plus large incoherent statistical noise,
+    # so the error against raw data plateaus at the noise floor. The meaningful
+    # question is how fast the first N pairs converge to the full coherent model.
     max_pairs = min(args.max_pairs, result.n_positive)
     full_model = result.reconstruct(list(range(1, result.n_positive + 1)), add_mean=False)
     coherent_fraction = float(np.linalg.norm(full_model) / np.linalg.norm(fluct))
     print(f"[recon] coherent fraction ||DMD model|| / ||fluctuation|| = "
           f"{coherent_fraction:.2f}  (the rest is incoherent DSMC noise)")
 
-    # --- error sweep: 1..max_pairs --------------------------------------- #
+    # --- error sweep from 1 to max_pairs --------------------------------- #
     err_rows, err_full, err_raw = [], [], []
     for n in range(1, max_pairs + 1):
         recon = result.reconstruct(list(range(1, n + 1)), add_mean=False)
@@ -128,7 +128,7 @@ def main() -> None:
     fig.savefig(dirs["figures"] / "reconstruction_error_vs_pairs.png", bbox_inches="tight")
     plt.close(fig)
 
-    # --- snapshot comparison: raw, full model, and 1/2/3-pair reconstruction --- #
+    # --- snapshot comparison of raw, full model, and 1/2/3-pair reconstruction --- #
     k = fluct.shape[0] // 2
     panels = [("raw fluctuation (noisy)", fluct[k]),
               ("full DMD model (coherent)", full_model[k])]
@@ -144,7 +144,7 @@ def main() -> None:
         im = ax.imshow(fld, origin="lower", aspect="auto", extent=ext, cmap="RdBu_r",
                        vmin=-m, vmax=m, interpolation="nearest")
         ax.set_ylabel("y [mm]")
-        ax.set_title(f"{f.symbol}'  --  {lab}")
+        ax.set_title(f"{f.symbol}':  {lab}")
         if args.display_y_max_mm:
             ax.set_ylim(float(f.y_mm[0]), args.display_y_max_mm)
         fig.colorbar(im, ax=ax, pad=0.01).set_label(f.units)
@@ -154,7 +154,7 @@ def main() -> None:
 
     # --- showcase animations --------------------------------------------- #
     # The showcase reconstructs from either an explicit set of ranks (--ranks,
-    # any subset, e.g. 1 3 5) or the first N pairs (--pairs).
+    # any subset such as 1 3 5) or the first N pairs (--pairs).
     if args.ranks:
         sel_ranks = [r for r in args.ranks if 1 <= r <= result.n_positive]
         tag = "ranks_" + "-".join(str(r) for r in sel_ranks)

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-04_dmd_analysis.py -- Dynamic Mode Decomposition, reported in physical units.
+04_dmd_analysis.py: Dynamic Mode Decomposition, reported in physical units.
 
 Runs the full DMD pipeline on one field over the (already converged) window and
 writes a tidy, self-describing bundle:
 
     figures/svd_distribution.png          singular-value decay (how many modes matter)
-    figures/field_overview.png            time-mean + one detrended snapshot
+    figures/field_overview.png            time-mean plus one detrended snapshot
     figures/dmd_frequency_spectrum.png    normalized amplitude vs. frequency [kHz]
-    modes/mode_XX.png                     real-part + amplitude map of each top mode
+    modes/mode_XX.png                     real-part and amplitude map of each top mode
     modes/mode_XX.npz                     raw 2-D mode fields (re-plot without re-running)
     tables/dmd_mode_summary.csv           f[kHz], growth[1/s], amplitude, lambda[mm], c[m/s], ...
     tables/svd_singular_values.csv
@@ -41,7 +41,7 @@ TUT = Path(__file__).resolve().parents[1]
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", type=Path, default=TUT / "data")
-    ap.add_argument("--out", type=Path, default=None, help="default: ../outputs/04_dmd/<field>")
+    ap.add_argument("--out", type=Path, default=None, help="defaults to ../outputs/04_dmd/<field>")
     ap.add_argument("--field", default="pressure")
     ap.add_argument("--x-min-mm", type=float, default=None)
     ap.add_argument("--x-max-mm", type=float, default=None)
@@ -64,7 +64,7 @@ def main() -> None:
         f = f.crop(args.x_min_mm, args.x_max_mm, args.y_min_mm, args.y_max_mm)
     print(f"[dmd] field '{args.field}' ({f.name}) cube {f.data.shape}, dt={f.dt_seconds:.3e}s")
 
-    # --- fit -------------------------------------------------------------- #
+    # Fit the DMD model.
     result = dmd.run_dmd(
         f.data, f.dt_seconds, f.x_mm, f.y_mm, units=f.units, symbol=f.symbol,
         detrend=args.detrend, moving_average_window=args.moving_average_window,
@@ -72,7 +72,7 @@ def main() -> None:
     print(f"[dmd] {result.n_positive} positive-frequency modes; "
           f"dominant at {result.mode_info(1)['frequency_khz']:.1f} kHz")
 
-    # --- overview figures ------------------------------------------------- #
+    # Overview figures.
     viz.plot_svd(result.singular_values, dirs["figures"] / "svd_distribution.png",
                  rank_marker=args.svd_rank)
 
@@ -86,7 +86,7 @@ def main() -> None:
                    units=f.units, out_path=dirs["figures"] / "field_overview_fluct.png",
                    cmap="RdBu_r", symmetric=True)
 
-    # --- frequency spectrum ---------------------------------------------- #
+    # Frequency spectrum.
     pos = result.pos_order
     freqs_khz = result.freq_hz[pos] / 1e3
     amps = np.abs(result.amplitudes[pos])
@@ -97,7 +97,7 @@ def main() -> None:
                       mark_khz=[(meta.raw.get("forcing", {}).get("frequency_hz") or 0) / 1e3]
                       if meta.raw.get("forcing", {}).get("frequency_hz") else [])
 
-    # --- per-mode export -------------------------------------------------- #
+    # Export each mode.
     rows = []
     for rank in range(1, result.n_positive + 1):
         info = result.mode_info(rank)

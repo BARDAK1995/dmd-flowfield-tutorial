@@ -1,5 +1,5 @@
 {
-  "title": "Hypersonic flat-plate DSMC -- portable DMD tutorial dataset",
+  "title": "Hypersonic flat-plate DSMC: portable DMD tutorial dataset",
   "description": "Trimmed, time-subsampled, dimensionalized excerpt of a Mach ~6 N2 flat-plate boundary layer forced by a localized wall actuator. Two fields: number density and pressure.",
   "provenance": {
     "source_case": "flatplate120x3_600k_800k_AVS250kHz_Vn100ms",

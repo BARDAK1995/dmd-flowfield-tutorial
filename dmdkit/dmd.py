@@ -1,5 +1,5 @@
 """
-dmd.py -- Dynamic Mode Decomposition, reported in physical units.
+dmd.py: Dynamic Mode Decomposition, reported in physical units.
 
 DMD factorises a sequence of snapshots into a set of spatial **modes**, each one
 evolving in time as a single complex exponential.  Mode k has:
@@ -24,7 +24,7 @@ Pipeline (matching the reference workflow, but generalised):
         ->  reconstruct the field from a chosen subset of modes
 
 The reconstruction step keeps **conjugate pairs** together so the rebuilt field
-stays real -- reconstructing from "the first N modes" really means the first N
+stays real.  Reconstructing from "the first N modes" really means the first N
 positive-frequency modes *and* their negative-frequency twins.
 """
 from __future__ import annotations
@@ -59,7 +59,7 @@ def detrend_snapshots(cube: np.ndarray, mode: str = "mean", window: int = 300):
     Remove a slowly varying background before DMD.
 
     mode = "mean"           : subtract the time-mean field (recommended for a
-                              statistically steady window -- the tutorial default).
+                              statistically steady window, the tutorial default).
     mode = "moving_average" : subtract a centred moving average (reference
                               pipeline default; use for records with residual drift).
     mode = "none"           : no detrending.
@@ -116,7 +116,7 @@ class DmdResult:
     def n_positive(self) -> int:
         return int(self.pos_order.size)
 
-    # -- per-(positive)-mode accessors ------------------------------------ #
+    # per-(positive)-mode accessors
     def full_index(self, rank: int) -> int:
         """Full DMD index of the rank-th positive-frequency mode (1-based)."""
         return int(self.pos_order[rank - 1])
@@ -158,14 +158,14 @@ class DmdResult:
         coeff = _coeff_scale(self.dynamics[i])
         return np.abs(self.modes[:, i].reshape(self.shape_yx)) * coeff
 
-    # -- reconstruction ---------------------------------------------------- #
+    # reconstruction
     def conjugate_partner(self, full_index: int) -> int:
         """Index of the mode whose eigenvalue is the complex conjugate."""
         target = np.conj(self.eigs[full_index])
         d = np.abs(self.eigs - target)
         d[full_index] = np.inf
         j = int(np.argmin(d))
-        # if no genuine partner (real eigenvalue), the mode is its own conjugate
+        # if there is no genuine partner (a real eigenvalue), the mode is its own conjugate
         if np.abs(self.eigs[full_index].imag) < 1e-12:
             return full_index
         return j
@@ -187,8 +187,8 @@ class DmdResult:
         real).
 
         ranks       : 1-based positive-frequency mode ranks, e.g. [1, 2, 3].
-        add_mean    : add the detrended-out background back (full field) vs.
-                      return only the reconstructed fluctuation.
+        add_mean    : if True, add the detrended-out background back for the full
+                      field; if False, return only the reconstructed fluctuation.
         time_indices: subset of snapshots to rebuild (default: all).
         """
         ti = np.arange(self.n_time) if time_indices is None else np.asarray(time_indices)
@@ -213,7 +213,7 @@ def _phase_align(mode_vec: np.ndarray) -> np.ndarray:
 
 
 def _coeff_scale(dynamics_row: np.ndarray) -> float:
-    """RMS of a mode's time coefficient -- gives the mode a physical amplitude."""
+    """RMS of a mode's time coefficient, which gives the mode a physical amplitude."""
     return float(np.sqrt(np.mean(np.abs(dynamics_row) ** 2)))
 
 
@@ -239,7 +239,7 @@ def run_dmd(cube: np.ndarray, dt_seconds: float, x_mm: np.ndarray, y_mm: np.ndar
     physically-dimensioned result.
 
     Defaults reproduce the reference pipeline's DMD family (forward-backward
-    exact DMD, optimal amplitudes, rank 30) but with ``detrend='mean'`` which is
+    exact DMD, optimal amplitudes, rank 30), but with ``detrend='mean'``, which is
     the natural choice for a statistically steady analysis window.
     """
     cube = np.asarray(cube, dtype=np.float64)
@@ -282,7 +282,7 @@ def estimate_wavelength_mm(real_map: np.ndarray, x_mm: np.ndarray,
 
     The mode is collapsed to a 1-D streamwise signal (averaged over y, or sampled
     at a chosen row), then a windowed real-FFT in x finds the peak wavenumber.
-    No boundary-layer line or edge criterion -- purely the spatial period.
+    No boundary-layer line or edge criterion, just the spatial period.
     """
     real_map = np.asarray(real_map, dtype=np.float64)
     signal = real_map.mean(axis=0) if y_index is None else real_map[y_index, :]
