@@ -49,8 +49,19 @@ def main() -> None:
 
     meta = dataset.load_metadata(args.data)
     probes = meta.raw.get("suggested_probes", {})
-    b = args.boundary or (probes["boundary"]["x_mm"], probes["boundary"]["y_mm"])
-    fsm = args.freestream or (probes["freestream"]["x_mm"], probes["freestream"]["y_mm"])
+    # use the command-line probe, else the metadata's suggested probe, else a
+    # sensible default from the domain extent (boundary near the wall mid-plate,
+    # freestream high and upstream)
+    x0, x1 = float(meta.x_mm[0]), float(meta.x_mm[-1])
+    y0, y1 = float(meta.y_mm[0]), float(meta.y_mm[-1])
+    default_boundary = (x0 + 0.5 * (x1 - x0), y0 + 0.2 * (y1 - y0))
+    default_freestream = (x0 + 0.2 * (x1 - x0), y0 + 0.9 * (y1 - y0))
+    b = (tuple(args.boundary) if args.boundary
+         else (probes["boundary"]["x_mm"], probes["boundary"]["y_mm"]) if "boundary" in probes
+         else default_boundary)
+    fsm = (tuple(args.freestream) if args.freestream
+           else (probes["freestream"]["x_mm"], probes["freestream"]["y_mm"]) if "freestream" in probes
+           else default_freestream)
     forcing_khz = (meta.raw.get("forcing", {}).get("frequency_hz") or 0.0) / 1e3
     fmax_khz = args.fmax_khz or meta.nyquist_hz / 1e3
     keys = meta.field_keys() if args.field == "all" else [args.field]

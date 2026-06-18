@@ -55,7 +55,7 @@ DMD_Tutorial/
         ├── data/                  # the dataset (versioned with Git LFS)
         │   ├── number_density_m3.npy   # (n_time, n_y, n_x) float32, m⁻³
         │   ├── pressure_Pa.npy         # (n_time, n_y, n_x) float32, Pa
-        │   └── dataset_metadata.json   # grid (mm), timestep (s), units, forcing
+        │   └── fieldinputs.dat         # dt (s), x range, y range, unit
         ├── results/               # all generated outputs, organized by step
         └── README.md              # describes the case and its results
 ```
@@ -106,16 +106,25 @@ the end.
 
 ## How the data is structured (the one thing to understand)
 
-A case is one array per field plus one JSON file.
+A case is one array per field plus one tiny text file. A `.npy` array stores only
+the raw numbers and the array shape; it carries no timestep, no domain size, and
+no units. So the toolkit reads the resolution and the snapshot count from the
+shape, and you supply the rest in a `fieldinputs.dat`.
 
-* The **field array** has shape `(n_time, n_y, n_x)` and is a `.npy` that loads
-  memory-mapped. Axis 0 is time (the snapshots), and axes 1 and 2 are the
-  spatial grid `(y, x)`.
-* **`dataset_metadata.json`** carries the physical context:
-  * `grid`: `x_min_mm, x_max_mm, y_min_mm, y_max_mm, nx, ny` for uniform cell centres.
-  * `time`: `dt_seconds` (the snapshot spacing), `step_first`, `step_interval`, `n_snapshots`.
-  * `fields`: for each field, its `file`, `name`, `symbol`, and `units`.
-  * `forcing`, `freestream`, `conversion`, and `suggested_probes` for context and sanity checks.
+* The **field arrays** have shape `(n_time, n_y, n_x)` and are `.npy` files that
+  load memory-mapped. Axis 0 is time (the snapshots), and axes 1 and 2 are the
+  spatial grid `(y, x)`. Each file is named `<name>_<unit>.npy`, for example
+  `pressure_Pa.npy` or `number_density_m3.npy`, and the toolkit reads the field
+  name and units from that filename.
+* **`fieldinputs.dat`** is four commented lines giving the three physical facts
+  the arrays cannot carry:
+
+  ```
+  1.0e-7        # dt, the time between snapshots, in seconds
+  40 100        # the x range, as "x_min x_max"
+  0 2.5         # the y range, as "y_min y_max"
+  mm            # the unit of the ranges
+  ```
 
 From `dt` alone, every frequency becomes dimensional:
 
@@ -129,8 +138,10 @@ That is exactly why the DMD and PSD results come out in kHz. A snapshot timestep
 of `dt = 1e-7 s` gives `fs = 10 MHz`, so a 250 kHz wave is sampled about 40 times
 per period and is resolved with plenty of room to spare.
 
-To run on your own data, write a `dataset_metadata.json` with the same keys and
-drop your `.npy` cubes next to it. No code changes are needed.
+To run on your own data, drop your `.npy` arrays in a folder, name them
+`<field>_<unit>.npy`, and write a `fieldinputs.dat` next to them. No code changes
+are needed. (A richer `dataset_metadata.json` sidecar is also supported when you
+want to attach extra context like a freestream reference or named probes.)
 
 ## What each script teaches
 

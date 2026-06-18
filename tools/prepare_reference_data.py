@@ -6,7 +6,7 @@ second-mode reference case.
 This is the provenance script for the HypersonicFlowOverPlate example. It takes
 the last N snapshots of the unforced Mach 6 flat-plate reference run (the case
 the second-mode DMD analysis in the paper was built on), calibrates the fields
-to physical units, and writes the two arrays plus a metadata sidecar.
+to physical units, and writes the two arrays plus a fieldinputs.dat.
 
 What it does
 ------------
@@ -20,8 +20,8 @@ What it does
    exact:
        number density  n = counts * (n_inf / freestream_counts)
        pressure        p = P_raw  * (p_inf / freestream_P_raw)
-4. Writes number_density_m3.npy, pressure_Pa.npy (float32), and
-   dataset_metadata.json into the example data directory.
+4. Writes number_density_m3.npy, pressure_Pa.npy (float32), and a four-line
+   fieldinputs.dat (dt, x range, y range, unit) into the example data directory.
 
 The grid is x = 40 to 100 mm by 1501 points and y = 0 to 2.5 mm by 63 points,
 and the snapshot spacing is dt = 1e-7 s (so fs = 10 MHz, Nyquist 5 MHz). The
@@ -31,7 +31,6 @@ case is unforced, so the dominant DMD mode is the natural second mode near
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import numpy as np
@@ -115,54 +114,40 @@ def main() -> None:
     p_fs = float(p_out[:, iy_fs, ix_fs].mean())
     print(f"[check]  written freestream-ish n ~ {n_fs:.3e} m^-3, p ~ {p_fs:.1f} Pa")
 
-    meta = {
-        "title": "Hypersonic flat-plate DSMC: second-mode reference case",
-        "description": ("Last 1000 snapshots of the unforced Mach 6 N2 flat-plate "
-                        "reference run, the case the paper's second-mode DMD analysis "
-                        "was built on. Fields calibrated to physical units against the "
-                        "validated freestream. Two fields: number density and pressure."),
-        "provenance": {
-            "source_case": "2ndMode_refDSMC/Datas/expensive_Ref (unforced reference)",
-            "original_n_snapshots": int(nt),
-            "kept_last": int(args.n_snapshots),
-            "stored_axis_order": "(time, x, y), transposed here to (time, y, x)",
-            "calibration": {
-                "number_density": f"n = counts * {fac_n:.6e} (anchored to n_inf = {N_INF_M3:.3e})",
-                "pressure": f"p = P_raw * {fac_p:.6e} (anchored to p_inf = {P_INF_PA} Pa)",
-                "freestream_counts": fs_counts, "freestream_P_raw": fs_praw,
-            },
-        },
-        "grid": {"x_min_mm": X_MIN_MM, "x_max_mm": X_MAX_MM,
-                 "y_min_mm": Y_MIN_MM, "y_max_mm": Y_MAX_MM,
-                 "nx": int(nx), "ny": int(ny), "note": "uniform cell centres in mm"},
-        "time": {"n_snapshots": int(n_out.shape[0]), "step_first": 0, "step_interval": 1,
-                 "dt_seconds": DT_SECONDS, "sampling_frequency_hz": 1.0 / DT_SECONDS,
-                 "nyquist_hz": 0.5 / DT_SECONDS,
-                 "note": "step_first/step_interval are nominal snapshot indices; dt is physical"},
-        "fields": {
-            "number_density": {"file": "number_density_m3.npy", "name": "Number density",
-                               "symbol": "n", "units": "m^-3", "dtype": "float32"},
-            "pressure": {"file": "pressure_Pa.npy", "name": "Pressure",
-                         "symbol": "p", "units": "Pa", "dtype": "float32"},
-        },
-        "forcing": {"type": "none (unforced reference; natural second-mode instability)"},
-        "freestream": {"gas": "N2", "mach": MACH, "U_mps": U_INF_MPS, "T_K": T_INF_K,
-                       "number_density_m3": N_INF_M3, "pressure_Pa": P_INF_PA,
-                       "molecular_mass_kg": N2_MASS_KG, "gas_constant_J_kgK": GAS_R,
-                       "gamma": GAMMA},
-        "suggested_probes": {
-            "boundary": {"x_mm": 70.0, "y_mm": 0.5,
-                         "note": "inside the boundary layer, mid-plate"},
-            "freestream": {"x_mm": 50.0, "y_mm": 2.4,
-                           "note": "top of the domain, outside the boundary layer"},
-        },
-    }
-    (args.out / "dataset_metadata.json").write_text(json.dumps(meta, indent=2, default=float),
-                                                    encoding="utf-8")
+    # Write the simple fieldinputs.dat. The toolkit reads grid resolution and
+    # snapshot count from the array shapes; this file supplies what the arrays
+    # cannot carry: the timestep, the x and y ranges, and the unit.
+    fieldinputs = f"""# fieldinputs.dat
+# Physical inputs for this dataset. The .npy field arrays in this folder have
+# shape (n_time, n_y, n_x); the toolkit reads the grid resolution and the
+# snapshot count straight from those shapes. The four values below supply what
+# the arrays cannot carry. Field names and units come from the .npy filenames
+# (the convention is <name>_<unit>.npy, e.g. pressure_Pa.npy, number_density_m3.npy).
+#
+# Provenance: last {args.n_snapshots} snapshots of the unforced Mach 6 N2
+# flat-plate reference run (2ndMode_refDSMC/Datas/expensive_Ref), the case the
+# paper's second-mode DMD analysis was built on. Number density was calibrated
+# from raw counts (n = counts * {fac_n:.4e}) and pressure from the raw field
+# (p = P_raw * {fac_p:.4e}), each anchored to the validated freestream
+# (n_inf = {N_INF_M3:.2e} m^-3, p_inf = {P_INF_PA:.0f} Pa).
+
+# Line 1: dt, the time between snapshots, in seconds.
+{DT_SECONDS:.3e}
+
+# Line 2: the x range of the domain, as "x_min x_max".
+{X_MIN_MM:g} {X_MAX_MM:g}
+
+# Line 3: the y range of the domain, as "y_min y_max".
+{Y_MIN_MM:g} {Y_MAX_MM:g}
+
+# Line 4: the unit of the ranges above.
+mm
+"""
+    (args.out / "fieldinputs.dat").write_text(fieldinputs, encoding="utf-8")
     mb = lambda p: p.stat().st_size / 1e6
     print(f"[write]  number_density_m3.npy  {mb(args.out/'number_density_m3.npy'):.1f} MB  shape {n_out.shape}")
     print(f"[write]  pressure_Pa.npy        {mb(args.out/'pressure_Pa.npy'):.1f} MB")
-    print(f"[write]  dataset_metadata.json")
+    print(f"[write]  fieldinputs.dat  (dt={DT_SECONDS:.1e}s, x {X_MIN_MM:g}-{X_MAX_MM:g}, y {Y_MIN_MM:g}-{Y_MAX_MM:g} mm)")
     print("[done]")
 
 

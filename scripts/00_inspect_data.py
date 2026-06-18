@@ -94,8 +94,13 @@ def main() -> None:
                        units=f.units, out_path=args.out / f"fluct_{key}.png",
                        cmap="RdBu_r", symmetric=True)
 
-    # if number density is in the dataset, cross-check that it is truly dimensional
-    if "number_density" in meta.field_keys():
+    # if number density is in the dataset and the metadata carries a freestream
+    # reference, cross-check that it is truly dimensional (skipped for minimal
+    # fieldinputs.dat datasets, which do not carry a freestream value)
+    has_fs_ref = ("number_density" in meta.field_keys()
+                  and "suggested_probes" in meta.raw
+                  and meta.raw.get("freestream", {}).get("number_density_m3"))
+    if has_fs_ref:
         f = dataset.load_field(args.data, "number_density")
         fs = meta.raw["suggested_probes"]["freestream"]
         ref = meta.raw["freestream"]["number_density_m3"]

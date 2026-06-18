@@ -1,0 +1,24 @@
+# fieldinputs.dat
+# Physical inputs for this dataset. The .npy field arrays in this folder have
+# shape (n_time, n_y, n_x); the toolkit reads the grid resolution and the
+# snapshot count straight from those shapes. The four values below supply what
+# the arrays cannot carry. Field names and units come from the .npy filenames
+# (the convention is <name>_<unit>.npy, e.g. pressure_Pa.npy, number_density_m3.npy).
+#
+# Provenance: last 1000 snapshots of the unforced Mach 6 N2 flat-plate reference
+# run (2ndMode_refDSMC/Datas/expensive_Ref), the case the paper's second-mode DMD
+# analysis was built on. Number density was calibrated from raw counts
+# (n = counts * 1.7352e+20) and pressure from the raw field (p = P_raw * 2.3502),
+# each anchored to the validated freestream (n_inf = 1.2e24 m^-3, p_inf = 828 Pa).
+
+# Line 1: dt, the time between snapshots, in seconds.
+1.000e-07
+
+# Line 2: the x range of the domain, as "x_min x_max".
+40 100
+
+# Line 3: the y range of the domain, as "y_min y_max".
+0 2.5
+
+# Line 4: the unit of the ranges above.
+mm

@@ -23,11 +23,15 @@ all case-specific scaffolding removed.
 
 ## How a case is defined
 
-A case is one `.npy` array per field with shape `(n_time, n_y, n_x)`, plus a
-`dataset_metadata.json` that gives the grid in mm, the timestep in seconds, the
-units, and some context. Everything physical follows from those two things. To
-run on a new case, write a `dataset_metadata.json` with the same keys and drop the
-arrays next to it, then point `--data` and `--out` at it. No code changes needed.
+A case is one `.npy` array per field with shape `(n_time, n_y, n_x)`, named
+`<field>_<unit>.npy`, plus a `fieldinputs.dat`. A `.npy` carries only the numbers
+and the shape, so the toolkit reads the resolution and snapshot count from the
+shape and takes the field name and units from the filename. `fieldinputs.dat`
+supplies the rest in four commented lines: the timestep in seconds, the x range,
+the y range, and the length unit. To run on a new case, drop the arrays in a
+folder, name them by the convention, write a `fieldinputs.dat`, and point
+`--data` and `--out` at it. No code changes needed. A richer
+`dataset_metadata.json` sidecar is also supported when extra context is wanted.
 
 ## Conventions to keep
 

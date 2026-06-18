@@ -32,18 +32,18 @@
   "snapshot_matrix_condition_number": 67623543022029.945,
   "dominant_mode": {
     "rank": 1,
-    "full_index": 13,
-    "frequency_hz": 280471.33722118085,
-    "frequency_khz": 280.4713372211808,
-    "growth_rate_per_s": -2378.4732443544535,
-    "amplitude_abs": 6.554888151267418e+23,
+    "full_index": 14,
+    "frequency_hz": 280471.3372211811,
+    "frequency_khz": 280.4713372211811,
+    "growth_rate_per_s": -2378.473244346331,
+    "amplitude_abs": 6.554888151265213e+23,
     "normalized_amplitude": 1.0,
-    "coefficient_rms": 5.848070231424353e+23,
+    "coefficient_rms": 5.848070231424583e+23,
     "wavelength_mm": 2.8571428571428577,
-    "phase_speed_mps": 801.3466777748025,
-    "eigenvalue_real": 0.9842783224825697,
-    "eigenvalue_imag": 0.17527293677801117,
-    "mode_real_abs_max": 1.0754581892320327e+22,
-    "mode_amplitude_max": 1.0754581892320329e+22
+    "phase_speed_mps": 801.3466777748033,
+    "eigenvalue_real": 0.9842783224825705,
+    "eigenvalue_imag": 0.17527293677801145,
+    "mode_real_abs_max": 1.0754581892320847e+22,
+    "mode_amplitude_max": 1.0754581892320845e+22
   }
 }

@@ -6,7 +6,7 @@
     "y_max_mm": 2.5,
     "nx": 1501,
     "ny": 63,
-    "note": "uniform cell centres in mm"
+    "note": "uniform cell centres; domain from fieldinputs.dat"
   },
   "time": {
     "n_snapshots": 1000,
@@ -15,7 +15,7 @@
     "dt_seconds": 1e-07,
     "sampling_frequency_hz": 10000000.0,
     "nyquist_hz": 5000000.0,
-    "note": "step_first/step_interval are nominal snapshot indices; dt is physical"
+    "domain_unit": "mm"
   },
   "fs_khz": 10000.0,
   "nyquist_khz": 5000.0,
@@ -54,12 +54,5 @@
         "p99": 833.4515857727051
       }
     }
-  },
-  "number_density_freestream_check": {
-    "probe_x_mm": 50.013324450366426,
-    "probe_y_mm": 2.4007936507936507,
-    "mean_value": 1.1977619581155537e+24,
-    "reference": 1.2e+24,
-    "relative_error": -0.0018650349037053122
   }
 }

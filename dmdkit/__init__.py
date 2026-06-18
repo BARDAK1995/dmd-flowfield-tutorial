@@ -12,8 +12,9 @@ layers, linear stability theory, or any particular experiment.  All it knows is:
       physical units (Hz or kHz, m/s, mm), and
     * how to reconstruct the flow field from a chosen subset of DMD modes.
 
-Everything is driven by a single ``dataset_metadata.json`` sidecar, so the same
-code runs on any case as long as that file describes the grid and timestep.
+Everything is driven by a small ``fieldinputs.dat`` next to the arrays (dt, the x
+and y ranges, and the unit), so the same code runs on any case. A richer
+``dataset_metadata.json`` sidecar is also supported for extra context.
 
 Modules
 -------

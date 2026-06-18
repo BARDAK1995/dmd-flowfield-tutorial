@@ -36,13 +36,12 @@ def main() -> None:
     run(["scripts/00_inspect_data.py"])
     run(["scripts/02_rms_fields.py"])
     run(["scripts/03_point_psd.py"])
-    run(["scripts/04_dmd_analysis.py", "--field", args.field,
-         "--x-min-mm", "40", "--x-max-mm", "100", "--y-max-mm", "2.5",
-         "--display-y-max-mm", "2.0"])
+    # the shipped data is already the analysis region, so no spatial crop is needed
+    run(["scripts/04_dmd_analysis.py", "--field", args.field, "--display-y-max-mm", "2.0"])
+    run(["scripts/04_dmd_analysis.py", "--field", "number_density", "--display-y-max-mm", "2.0"])
     if not args.quick:
-        run(["scripts/01_animate_field.py", "--step", "1", "--display-y-max-mm", "2.5"])
+        run(["scripts/01_animate_field.py", "--step", "5", "--display-y-max-mm", "2.5"])
         run(["scripts/05_reconstruct_from_modes.py", "--field", args.field, "--pairs", "3",
-             "--x-min-mm", "40", "--x-max-mm", "100", "--y-max-mm", "2.5",
              "--display-y-max-mm", "2.0"])
     print("\n[all done] see ./examples/HypersonicFlowOverPlate/results/")
 
