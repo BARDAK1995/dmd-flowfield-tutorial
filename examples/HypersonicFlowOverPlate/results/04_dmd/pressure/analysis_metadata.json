@@ -33,17 +33,17 @@
   "dominant_mode": {
     "rank": 1,
     "full_index": 6,
-    "frequency_hz": 279814.67294447916,
-    "frequency_khz": 279.8146729444792,
-    "growth_rate_per_s": -2671.5120062521564,
-    "amplitude_abs": 445.8536865798977,
+    "frequency_hz": 279814.6729444801,
+    "frequency_khz": 279.8146729444801,
+    "growth_rate_per_s": -2671.5120062883625,
+    "amplitude_abs": 445.8536865805774,
     "normalized_amplitude": 1.0,
-    "coefficient_rms": 392.47867543314715,
+    "coefficient_rms": 392.47867543309826,
     "wavelength_mm": 2.8571428571428577,
-    "phase_speed_mps": 799.4704941270835,
-    "eigenvalue_real": 0.9843217104580272,
-    "eigenvalue_imag": 0.17486169001197094,
-    "mode_real_abs_max": 6.67479953829984,
-    "mode_amplitude_max": 6.67479953829984
+    "phase_speed_mps": 799.4704941270861,
+    "eigenvalue_real": 0.9843217104580235,
+    "eigenvalue_imag": 0.17486169001197088,
+    "mode_real_abs_max": 6.674799538298736,
+    "mode_amplitude_max": 6.674799538298736
   }
 }
